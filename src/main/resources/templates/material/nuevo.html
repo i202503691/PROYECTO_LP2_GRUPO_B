@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layoutBase(~{::contenido})">
+<div th:fragment="contenido">
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <h1 class="card-title text-center">Material Nuevo</h1>
+                <div class="row d-flex justify-content-center">
+                    <div class="col-md-6">
+                        <form th:action="@{/material/registrar}" th:object="${material}" class="row g-2" method="post" novalidate>
+                            <div class="col-md-12">
+                                <label for="nombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" th:field="*{nombre}" placeholder="Nombre del material" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="tipoMaterial" class="form-label">Tipo Material</label>
+                                <select class="form-select" th:field="*{tipoMaterial}">
+                                    <option value="" selected hidden="hidden">--Seleccione--</option>
+                                    <option th:each="item: ${tipos}" th:value="${item.idTipoMaterial}"
+                                        th:text="${item.nombre}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="unidadMedida" class="form-label">Unidad de Medida</label>
+                                <select class="form-select" th:field="*{unidadMedida}">
+                                    <option value="" selected hidden="hidden">--Seleccione--</option>
+                                    <option value="unidad">Unidad</option>
+                                    <option value="metro">Metro</option>
+                                    <option value="par">Par</option>
+                                    <option value="hoja">Hoja</option>
+                                    <option value="placa">Placa</option>
+                                    <option value="galon">Galon</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="stockActual" class="form-label">Stock Actual</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fa-solid fa-cubes-stacked"></i></span>
+                                    <input type="number" class="form-control" step="0.01" th:field="*{stockActual}" placeholder="0">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="precioReferencial" class="form-label">Precio Referencial</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">S/.</span>
+                                    <input type="number" class="form-control" step="0.01" th:field="*{precioReferencial}" placeholder="0.00">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label for="descripcion" class="form-label">Descripcion</label>
+                                <textarea class="form-control" th:field="*{descripcion}" rows="3" placeholder="Descripcion del material"></textarea>
+                            </div>
+                            <div class="col-md-12 d-flex justify-content-between">
+                                <a th:href="@{/material/listado}" class="btn btn-outline-dark">
+                                    <i class="fa-solid fa-reply"></i> Regresar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-floppy-disk"></i> Registrar
+                                </button>
+                                <button type="reset" class="btn btn-secondary">
+                                    <i class="fa-solid fa-broom"></i> Limpiar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <th:block th:utext="${alert}"></th:block>
+</div>
+</html>
