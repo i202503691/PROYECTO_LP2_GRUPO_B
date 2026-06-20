@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layoutBase(~{::contenido})">
+<div th:fragment="contenido">
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-10">
+                        <h1 class="card-title">Listado de Proveedores</h1>
+                    </div>
+                    <div class="col-md-2">
+                        <a th:href="@{/proveedor/nuevo}" class="btn btn-success w-100">
+                            <i class="fa-solid fa-plus"></i> Nuevo
+                        </a>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <fieldset class="border border-2 border-dark pb-2">
+                        <legend class="float-none w-auto px-2">Filtros</legend>
+                        <form th:action="@{/proveedor/listado}" method="get" th:object="${filter}">
+                            <div class="row align-items-end">
+                                <div class="col-md-4">
+                                    <label for="razonSocial" class="form-label">Razon Social</label>
+                                    <input type="text" class="form-control" th:field="*{razonSocial}" placeholder="Buscar por razon social">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="ruc" class="form-label">RUC</label>
+                                    <input type="text" class="form-control" th:field="*{ruc}" placeholder="Buscar por RUC">
+                                </div>
+                                <div class="col-md-4 text-end">
+                                    <button type="submit" class="btn btn-outline-dark">
+                                        <i class="fa-solid fa-binoculars"></i> Buscar
+                                    </button>
+                                    <a th:href="@{/proveedor/listado}" class="btn btn-outline-secondary">
+                                        <i class="fa-solid fa-broom"></i> Limpiar
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </fieldset>
+                </div>
+                <table id="tbl-proveedor" class="table table-hover table-responsive">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th>Id</th>
+                            <th>Razon Social</th>
+                            <th>RUC</th>
+                            <th>Celular</th>
+                            <th>Email</th>
+                            <th>Activo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-secondary">
+                        <tr th:each="item: ${lstProveedores}">
+                            <td th:text="${item.idProveedor}" class="text-center"></td>
+                            <td th:text="${item.razonSocial}"></td>
+                            <td th:text="${item.ruc}"></td>
+                            <td th:text="${item.celular}"></td>
+                            <td th:text="${item.email}"></td>
+                            <td>
+                                <span class="badge" th:classappend="(${item.activo}) ? 'bg-success' : 'bg-secondary'"
+                                    th:text="${item.activoDescripcion}">
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                    <a th:href="@{/proveedor/edicion/{id}(id=${item.idProveedor})}"
+                                        class="btn btn-outline-primary" title="Editar">
+                                        <i class="fa-regular fa-pen-to-square"></i>
+                                    </a>
+                                    <form method="post" th:action="@{/proveedor/cambiar-estado}">
+                                        <div class="form-switch">
+                                            <input type="hidden" th:name="id" th:value="${item.idProveedor}">
+                                            <input class="form-check-input" type="checkbox" th:checked="${item.activo}"
+                                                onchange="this.form.submit()">
+                                        </div>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <th:block th:utext="${toast}"></th:block>
+    <script th:inline="none">
+        $(function () {
+            $('#tbl-proveedor').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+                },
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],
+                ordering: true,
+                order: [[0, 'desc']],
+                responsive: true,
+                columnDefs: [
+                    { targets: [5, 6], orderable: false },
+                    { targets: [0, 2, 3, 4, 6], searchable: false }
+                ]
+            });
+        });
+    </script>
+</div>
+</html>

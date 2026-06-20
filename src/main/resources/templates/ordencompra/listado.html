@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layoutBase(~{::contenido})">
+<div th:fragment="contenido">
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-10">
+                        <h1 class="card-title">Consulta de Ordenes de Compra</h1>
+                    </div>
+                    <div class="col-md-2">
+                        <a th:href="@{/ordencompra/nuevo}" class="btn btn-success w-100">
+                            <i class="fa-solid fa-plus"></i> Nueva OC
+                        </a>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <fieldset class="border border-2 border-dark pb-2">
+                        <legend class="float-none w-auto px-2">Filtros</legend>
+                        <form th:action="@{/ordencompra/listado}" method="get" th:object="${filter}">
+                            <div class="row align-items-end">
+                                <div class="col-md-3">
+                                    <label for="idOrdenCompra" class="form-label">Id Orden</label>
+                                    <input type="number" class="form-control" th:field="*{idOrdenCompra}" placeholder="Buscar por ID">
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="idProveedor" class="form-label">Proveedor</label>
+                                    <select class="form-select" th:field="*{idProveedor}">
+                                        <option value="">--Todos--</option>
+                                        <option th:each="item: ${proveedores}" th:value="${item.idProveedor}"
+                                            th:text="${item.razonSocial}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="estado" class="form-label">Estado</label>
+                                    <select class="form-select" th:field="*{estado}">
+                                        <option value="">--Todos--</option>
+                                        <option value="PENDIENTE">PENDIENTE</option>
+                                        <option value="ENVIADO">ENVIADO</option>
+                                        <option value="ANULADO">ANULADO</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3 text-end">
+                                    <button type="submit" class="btn btn-outline-dark">
+                                        <i class="fa-solid fa-binoculars"></i> Buscar
+                                    </button>
+                                    <a th:href="@{/ordencompra/listado}" class="btn btn-outline-secondary">
+                                        <i class="fa-solid fa-broom"></i> Limpiar
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </fieldset>
+                </div>
+                <table id="tbl-orden" class="table table-hover table-responsive">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th>Id</th>
+                            <th>Proveedor</th>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>Total</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-secondary">
+                        <tr th:each="item: ${lstOrdenes}">
+                            <td th:text="${item.idOrdenCompra}" class="text-center"></td>
+                            <td th:text="${item.proveedor.razonSocial}"></td>
+                            <td th:text="${#temporals.format(item.fecha, 'dd/MM/yyyy')}"></td>
+                            <td>
+                                <span class="badge"
+                                    th:classappend="${item.estado == 'PENDIENTE'} ? 'bg-warning text-dark' : (${item.estado == 'ENVIADO'} ? 'bg-success' : 'bg-danger')"
+                                    th:text="${item.estado}">
+                                </span>
+                            </td>
+                            <td th:text="|S/. ${#numbers.formatDecimal(item.total, 1, 'COMMA', 2, 'POINT')}|" class="text-end"></td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                    <a th:href="@{/ordencompra/detalle/{id}(id=${item.idOrdenCompra})}"
+                                        class="btn btn-outline-info" title="Ver detalle">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                    <select class="form-select form-select-sm estado-select" style="width: 130px;">
+                                        <option value="PENDIENTE" th:selected="${item.estado == 'PENDIENTE'}">PENDIENTE</option>
+                                        <option value="ENVIADO" th:selected="${item.estado == 'ENVIADO'}">ENVIADO</option>
+                                        <option value="ANULADO" th:selected="${item.estado == 'ANULADO'}">ANULADO</option>
+                                    </select>
+                                    <button type="button" class="btn btn-outline-warning btn-sm btn-cambiar-oc"
+                                        th:attr="data-id=${item.idOrdenCompra}" title="Cambiar estado">
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <th:block th:utext="${toast}"></th:block>
+    <script th:inline="none">
+        $(function () {
+            $('#tbl-orden').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+                },
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],
+                ordering: true,
+                order: [[0, 'desc']],
+                responsive: true,
+                columnDefs: [
+                    { targets: [5], orderable: false },
+                    { targets: [0, 2, 3, 4, 5], searchable: false }
+                ]
+            });
+        });
+
+        function crearInputOculto(name, value) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = value;
+            return input;
+        }
+
+        document.getElementById('tbl-orden').addEventListener('click', function (e) {
+            var btn = e.target.closest('.btn-cambiar-oc');
+            if (!btn) return;
+            var tr = btn.closest('tr');
+            var select = tr.querySelector('.estado-select');
+            var id = btn.getAttribute('data-id');
+            var nuevoEstado = select.value;
+
+            Swal.fire({
+                title: 'Cambiar estado?',
+                text: 'La orden pasara a: ' + nuevoEstado,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Si, cambiar',
+                cancelButtonText: 'No'
+            }).then(function (result) {
+                if (result.isConfirmed) {
+                    var form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/ordencompra/cambiar-estado';
+                    form.appendChild(crearInputOculto('id', id));
+                    form.appendChild(crearInputOculto('nuevoEstado', nuevoEstado));
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        });
+    </script>
+</div>
+</html>

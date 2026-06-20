@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layoutBase(~{::contenido})">
+<div th:fragment="contenido">
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <h1 class="card-title text-center">Detalle de Orden de Compra</h1>
+                <div class="row border border-2 border-dark p-3 mb-3 rounded">
+                    <div class="col-md-3">
+                        <strong>Id Orden:</strong> <span th:text="${orden.idOrdenCompra}"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Proveedor:</strong> <span th:text="${orden.proveedor.razonSocial}"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Fecha:</strong> <span th:text="${#temporals.format(orden.fecha, 'dd/MM/yyyy')}"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Estado:</strong>
+                        <span class="badge"
+                            th:classappend="${orden.estado == 'PENDIENTE'} ? 'bg-warning text-dark' : (${orden.estado == 'ENVIADO'} ? 'bg-success' : 'bg-danger')"
+                            th:text="${orden.estado}">
+                        </span>
+                    </div>
+                    <div class="col-md-12 mt-2">
+                        <strong>Observaciones:</strong> <span th:text="${orden.observaciones ?: 'Ninguna'}"></span>
+                    </div>
+                </div>
+
+                <table class="table table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Material</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="det, iter: ${detalles}">
+                            <td class="text-center" th:text="${iter.count}"></td>
+                            <td th:text="${det.material.nombre}"></td>
+                            <td class="text-end" th:text="${det.cantidad}"></td>
+                            <td class="text-end" th:text="|S/. ${#numbers.formatDecimal(det.precioUnitario, 1, 'COMMA', 2, 'POINT')}|"></td>
+                            <td class="text-end" th:text="|S/. ${#numbers.formatDecimal(det.subtotal, 1, 'COMMA', 2, 'POINT')}|"></td>
+                        </tr>
+                    </tbody>
+                    <tfoot class="table-secondary">
+                        <tr>
+                            <th colspan="4" class="text-end">Total:</th>
+                            <th class="text-end" th:text="|S/. ${#numbers.formatDecimal(orden.total, 1, 'COMMA', 2, 'POINT')}|"></th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div class="d-flex justify-content-between">
+                    <a th:href="@{/ordencompra/listado}" class="btn btn-outline-dark">
+                        <i class="fa-solid fa-reply"></i> Regresar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</html>

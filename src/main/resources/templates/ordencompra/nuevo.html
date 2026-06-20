@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layoutBase(~{::contenido})">
+<div th:fragment="contenido">
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <h1 class="card-title text-center">Nueva Orden de Compra</h1>
+                <div class="row d-flex justify-content-center">
+                    <div class="col-md-10">
+                        <form id="form-oc" th:action="@{/ordencompra/registrar}" method="post">
+                            <div class="row g-2 border border-2 border-dark p-3 mb-3 rounded">
+                                <div class="col-md-5">
+                                    <label for="proveedor" class="form-label">Proveedor</label>
+                                    <select class="form-select" name="proveedor" required>
+                                        <option value="">--Seleccione--</option>
+                                        <option th:each="item: ${proveedores}" th:value="${item.idProveedor}"
+                                            th:text="${item.razonSocial}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="fecha" class="form-label">Fecha</label>
+                                    <input type="date" class="form-control" name="fecha" th:value="${#temporals.format(fecha, 'yyyy-MM-dd')}" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="observaciones" class="form-label">Observaciones</label>
+                                    <textarea class="form-control" name="observaciones" rows="1" placeholder="Observaciones"></textarea>
+                                </div>
+                            </div>
+
+                            <fieldset class="border border-2 border-dark p-3 mb-3 rounded">
+                                <legend class="float-none w-auto px-2">Detalle de la Orden</legend>
+                                <table class="table table-bordered" id="detalle-table">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th style="width: 5%;">#</th>
+                                            <th style="width: 30%;">Tipo Material</th>
+                                            <th style="width: 25%;">Material</th>
+                                            <th style="width: 10%;">Cantidad</th>
+                                            <th style="width: 12%;">Precio Unit.</th>
+                                            <th style="width: 12%;">Subtotal</th>
+                                            <th style="width: 6%;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="detalle-body">
+                                        <tr class="detalle-row">
+                                            <td class="text-center index">1</td>
+                                            <td>
+                                                <select class="form-select tipo-material" name="tipoMaterial" onchange="filtrarMaterial(this)">
+                                                    <option value="">--Seleccione--</option>
+                                                    <option th:each="t: ${tipos}" th:value="${t.idTipoMaterial}"
+                                                        th:text="${t.nombre}"></option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="form-select material" name="materialId" required>
+                                                    <option value="">--Primero seleccione tipo--</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control cantidad" name="cantidad" step="0.01" min="0.01"
+                                                    placeholder="0" required oninput="calcularFila(this)">
+                                            </td>
+                                            <td>
+                                                <input type="number" class="form-control precio" name="precio" step="0.01" min="0.01"
+                                                    placeholder="0.00" required oninput="calcularFila(this)">
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control subtotal" readonly placeholder="0.00">
+                                            </td>
+                                            <td class="text-center">
+                                                <button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarFila(this)">
+                                                    <i class="fa-solid fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <button type="button" class="btn btn-outline-success" onclick="agregarFila()">
+                                            <i class="fa-solid fa-plus"></i> Agregar detalle
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6 text-end">
+                                        <h4>Total: S/. <span id="total">0.00</span></h4>
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <div class="d-flex justify-content-between">
+                                <a th:href="@{/ordencompra/listado}" class="btn btn-outline-dark">
+                                    <i class="fa-solid fa-reply"></i> Regresar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-floppy-disk"></i> Registrar
+                                </button>
+                                <button type="reset" class="btn btn-secondary">
+                                    <i class="fa-solid fa-broom"></i> Limpiar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <th:block th:utext="${alert}"></th:block>
+
+    <script>
+        function filtrarMaterial(select) {
+            var tr = select.closest('tr');
+            var matSelect = tr.querySelector('.material');
+            var precioInput = tr.querySelector('.precio');
+            var idTipo = select.value;
+
+            if (!idTipo) {
+                matSelect.innerHTML = '<option value="">--Primero seleccione tipo--</option>';
+                return;
+            }
+
+            matSelect.innerHTML = '<option value="">--Cargando--</option>';
+
+            fetch('/material/listado-json?idTipoMaterial=' + idTipo)
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    matSelect.innerHTML = '<option value="">--Seleccione--</option>';
+                    data.forEach(function (m) {
+                        var opt = document.createElement('option');
+                        opt.value = m.idMaterial;
+                        opt.textContent = m.nombre + ' (S/. ' + m.precioReferencial.toFixed(2) + ')';
+                        opt.setAttribute('data-precio', m.precioReferencial);
+                        matSelect.appendChild(opt);
+                    });
+                    if (matSelect._tempValue) {
+                        matSelect.value = matSelect._tempValue;
+                        delete matSelect._tempValue;
+                    }
+                });
+        }
+
+        document.getElementById('detalle-body').addEventListener('change', function (e) {
+            if (e.target.classList.contains('material')) {
+                var tr = e.target.closest('tr');
+                var precioInput = tr.querySelector('.precio');
+                var selectedOpt = e.target.options[e.target.selectedIndex];
+                if (selectedOpt && selectedOpt.dataset.precio) {
+                    precioInput.value = selectedOpt.dataset.precio;
+                    calcularFila(precioInput);
+                }
+            }
+        });
+
+        function calcularFila(input) {
+            var tr = input.closest('tr');
+            var cantidad = parseFloat(tr.querySelector('.cantidad').value) || 0;
+            var precio = parseFloat(tr.querySelector('.precio').value) || 0;
+            var subtotal = cantidad * precio;
+            tr.querySelector('.subtotal').value = subtotal.toFixed(2);
+            calcularTotal();
+        }
+
+        function calcularTotal() {
+            var subtotals = document.querySelectorAll('.subtotal');
+            var total = 0;
+            subtotals.forEach(function (s) {
+                total += parseFloat(s.value) || 0;
+            });
+            document.getElementById('total').textContent = total.toFixed(2);
+        }
+
+        function agregarFila() {
+            var tbody = document.getElementById('detalle-body');
+            var rows = tbody.querySelectorAll('tr');
+            var newRow = rows[0].cloneNode(true);
+
+            newRow.querySelector('.tipo-material').value = '';
+            newRow.querySelector('.material').innerHTML = '<option value="">--Primero seleccione tipo--</option>';
+            newRow.querySelector('.cantidad').value = '';
+            newRow.querySelector('.precio').value = '';
+            newRow.querySelector('.subtotal').value = '0.00';
+
+            tbody.appendChild(newRow);
+            actualizarIndices();
+        }
+
+        function eliminarFila(btn) {
+            var tbody = document.getElementById('detalle-body');
+            if (tbody.querySelectorAll('tr').length <= 1) {
+                Swal.fire('Error', 'Debe haber al menos un detalle', 'error');
+                return;
+            }
+            btn.closest('tr').remove();
+            actualizarIndices();
+            calcularTotal();
+        }
+
+        function actualizarIndices() {
+            var rows = document.querySelectorAll('#detalle-body tr');
+            rows.forEach(function (row, i) {
+                row.querySelector('.index').textContent = i + 1;
+            });
+        }
+
+        document.getElementById('form-oc').addEventListener('submit', function (e) {
+            var materiales = document.querySelectorAll('select[name="materialId"]');
+            var valid = true;
+            materiales.forEach(function (sel) {
+                if (!sel.value) valid = false;
+            });
+            if (!valid) {
+                e.preventDefault();
+                Swal.fire('Error', 'Complete todos los materiales', 'error');
+            }
+        });
+    </script>
+</div>
+</html>
