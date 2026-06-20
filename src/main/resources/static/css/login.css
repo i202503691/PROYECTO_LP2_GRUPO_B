@@ -1,0 +1,10 @@
+* { margin:0; padding:0; }
+
+body {
+    background-image: url('imagenes/laser.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.box-login { width:400px; }

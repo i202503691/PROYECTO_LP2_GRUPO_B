@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layoutBase(~{::contenido})">
+<div th:fragment="contenido">
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <h1 class="card-title text-center">Tipo de Material Nuevo</h1>
+                <div class="row d-flex justify-content-center">
+                    <div class="col-md-6">
+                        <form th:action="@{/tipomaterial/registrar}" th:object="${tipoMaterial}" class="row g-2" method="post" novalidate>
+                            <div class="col-md-6">
+                                <label for="nombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" th:field="*{nombre}" placeholder="Nombre del tipo" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label for="descripcion" class="form-label">Descripcion</label>
+                                <textarea class="form-control" th:field="*{descripcion}" rows="3" placeholder="Descripcion del tipo de material"></textarea>
+                            </div>
+                            <div class="col-md-12 d-flex justify-content-between">
+                                <a th:href="@{/tipomaterial/listado}" class="btn btn-outline-dark">
+                                    <i class="fa-solid fa-reply"></i> Regresar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa-solid fa-floppy-disk"></i> Registrar
+                                </button>
+                                <button type="reset" class="btn btn-secondary">
+                                    <i class="fa-solid fa-broom"></i> Limpiar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <th:block th:utext="${alert}"></th:block>
+</div>
+</html>

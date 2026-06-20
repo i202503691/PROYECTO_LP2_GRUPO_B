@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layoutBase(~{::contenido})">
+<div th:fragment="contenido">
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-10">
+                        <h1 class="card-title">Listado de Tipos de Material</h1>
+                    </div>
+                    <div class="col-md-2">
+                        <a th:href="@{/tipomaterial/nuevo}" class="btn btn-success w-100">
+                            <i class="fa-solid fa-plus"></i> Nuevo
+                        </a>
+                    </div>
+                </div>
+                <table id="tbl-tipomaterial" class="table table-hover table-responsive">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th>Id</th>
+                            <th>Nombre</th>
+                            <th>Descripcion</th>
+                            <th>Activo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-secondary">
+                        <tr th:each="item: ${lstTipos}">
+                            <td th:text="${item.idTipoMaterial}" class="text-center"></td>
+                            <td th:text="${item.nombre}"></td>
+                            <td th:text="${item.descripcion}"></td>
+                            <td>
+                                <span class="badge" th:classappend="(${item.activo}) ? 'bg-success' : 'bg-secondary'"
+                                    th:text="${item.activoDescripcion}">
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                    <a th:href="@{/tipomaterial/edicion/{id}(id=${item.idTipoMaterial})}"
+                                        class="btn btn-outline-primary" title="Editar">
+                                        <i class="fa-regular fa-pen-to-square"></i>
+                                    </a>
+                                    <form method="post" th:action="@{/tipomaterial/cambiar-estado}">
+                                        <div class="form-switch">
+                                            <input type="hidden" th:name="id" th:value="${item.idTipoMaterial}">
+                                            <input class="form-check-input" type="checkbox" th:checked="${item.activo}"
+                                                onchange="this.form.submit()">
+                                        </div>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <th:block th:utext="${toast}"></th:block>
+    <script th:inline="none">
+        $(function () {
+            $('#tbl-tipomaterial').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+                },
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],
+                ordering: true,
+                order: [[0, 'desc']],
+                responsive: true,
+                columnDefs: [
+                    { targets: [3, 4], orderable: false },
+                    { targets: [0, 3, 4], searchable: false }
+                ]
+            });
+        });
+    </script>
+</div>
+</html>

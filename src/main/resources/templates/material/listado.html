@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="layout :: layoutBase(~{::contenido})">
+<div th:fragment="contenido">
+    <div class="container mt-5">
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-10">
+                        <h1 class="card-title">Listado de Materiales</h1>
+                    </div>
+                    <div class="col-md-2">
+                        <a th:href="@{/material/nuevo}" class="btn btn-success w-100">
+                            <i class="fa-solid fa-plus"></i> Nuevo
+                        </a>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <fieldset class="border border-2 border-dark pb-2">
+                        <legend class="float-none w-auto px-2">Filtros</legend>
+                        <form th:action="@{/material/listado}" method="get">
+                            <div class="row align-items-end">
+                                <div class="col-md-6">
+                                    <label for="idTipoMaterial" class="form-label">Tipo Material</label>
+                                    <select class="form-select" name="idTipoMaterial">
+                                        <option value="">--Todos--</option>
+                                        <option th:each="tipo: ${tipos}" th:value="${tipo.idTipoMaterial}"
+                                            th:text="${tipo.nombre}"
+                                            th:selected="${idTipoMaterial != null && idTipoMaterial == tipo.idTipoMaterial}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <button type="submit" class="btn btn-outline-dark">
+                                        <i class="fa-solid fa-binoculars"></i> Buscar
+                                    </button>
+                                    <a th:href="@{/material/listado}" class="btn btn-outline-secondary">
+                                        <i class="fa-solid fa-broom"></i> Limpiar
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </fieldset>
+                </div>
+                <table id="tbl-material" class="table table-hover table-responsive">
+                    <thead class="table-dark text-center">
+                        <tr>
+                            <th>Id</th>
+                            <th>Nombre</th>
+                            <th>Tipo Material</th>
+                            <th>Unidad Medida</th>
+                            <th>Stock Actual</th>
+                            <th>Precio Ref.</th>
+                            <th>Activo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="table-secondary">
+                        <tr th:each="item: ${lstMateriales}">
+                            <td th:text="${item.idMaterial}" class="text-center"></td>
+                            <td th:text="${item.nombre}"></td>
+                            <td th:text="${item.tipoMaterial.nombre}"></td>
+                            <td th:text="${item.unidadMedida}"></td>
+                            <td th:text="${item.stockActual}" class="text-end"></td>
+                            <td th:text="|S/. ${#numbers.formatDecimal(item.precioReferencial, 1, 'COMMA', 2, 'POINT')}|" class="text-end"></td>
+                            <td>
+                                <span class="badge" th:classappend="(${item.activo}) ? 'bg-success' : 'bg-secondary'"
+                                    th:text="${item.activoDescripcion}">
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center align-items-center gap-2">
+                                    <a th:href="@{/material/edicion/{id}(id=${item.idMaterial})}"
+                                        class="btn btn-outline-primary" title="Editar">
+                                        <i class="fa-regular fa-pen-to-square"></i>
+                                    </a>
+                                    <form method="post" th:action="@{/material/cambiar-estado}">
+                                        <div class="form-switch">
+                                            <input type="hidden" th:name="id" th:value="${item.idMaterial}">
+                                            <input class="form-check-input" type="checkbox" th:checked="${item.activo}"
+                                                onchange="this.form.submit()">
+                                        </div>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <th:block th:utext="${toast}"></th:block>
+    <script th:inline="none">
+        $(function () {
+            $('#tbl-material').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+                },
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],
+                ordering: true,
+                order: [[0, 'desc']],
+                responsive: true,
+                columnDefs: [
+                    { targets: [2, 3, 4, 5, 6, 7], orderable: false },
+                    { targets: [0, 2, 3, 4, 5, 7], searchable: false }
+                ]
+            });
+        });
+    </script>
+</div>
+</html>
