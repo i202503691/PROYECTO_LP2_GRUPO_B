@@ -7,7 +7,7 @@
                 <h1 class="card-title text-center">Material Nuevo</h1>
                 <div class="row d-flex justify-content-center">
                     <div class="col-md-6">
-                        <form th:action="@{/material/registrar}" th:object="${material}" class="row g-2" method="post" novalidate>
+                        <form id="form-material" th:action="@{/material/registrar}" th:object="${material}" class="row g-2" method="post" novalidate>
                             <div class="col-md-12">
                                 <label for="nombre" class="form-label">Nombre</label>
                                 <input type="text" class="form-control" th:field="*{nombre}" placeholder="Nombre del material" required>
@@ -32,18 +32,18 @@
                                     <option value="galon">Galon</option>
                                 </select>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 position-relative">
                                 <label for="stockActual" class="form-label">Stock Actual</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fa-solid fa-cubes-stacked"></i></span>
-                                    <input type="number" class="form-control" step="0.01" th:field="*{stockActual}" placeholder="0">
+                                    <input type="number" class="form-control" step="0.01" th:field="*{stockActual}" placeholder="0" required>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-6 position-relative">
                                 <label for="precioReferencial" class="form-label">Precio Referencial</label>
                                 <div class="input-group">
                                     <span class="input-group-text">S/.</span>
-                                    <input type="number" class="form-control" step="0.01" th:field="*{precioReferencial}" placeholder="0.00">
+                                    <input type="number" class="form-control" step="0.01" th:field="*{precioReferencial}" placeholder="0.00" required>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -68,5 +68,35 @@
         </div>
     </div>
     <th:block th:utext="${alert}"></th:block>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#form-material").validate({
+                rules: {
+                    stockActual: { required: true, number: true, min: 0 },
+                    precioReferencial: { required: true, number: true, min: 0 }
+                },
+                messages: {
+                    stockActual: {
+                        required: "campo requerido",
+                        number: "debe ser un número",
+                        min: "no se permiten valores negativos"
+                    },
+                    precioReferencial: {
+                        required: "campo requerido",
+                        number: "debe ser un número",
+                        min: "no se permiten valores negativos"
+                    }
+                },
+                errorElement: 'div',
+                errorClass: 'invalid-tooltip',
+                highlight: function (element) {
+                    $(element).addClass('is-invalid').removeClass('is-valid');
+                },
+                unhighlight: function (element) {
+                    $(element).removeClass('is-invalid').addClass('is-valid');
+                }
+            });
+        });
+    </script>
 </div>
 </html>

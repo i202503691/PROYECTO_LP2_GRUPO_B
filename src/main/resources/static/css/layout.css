@@ -81,3 +81,9 @@ body {
     cursor:pointer;
     font-size:18px;
 }
+
+main {
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(2px);
+    min-height: calc(100vh - 70px);
+}
