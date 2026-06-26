@@ -297,7 +297,14 @@ where v.id_orden_compra =$P{PNumeroOrden}]]>
 								<text><![CDATA[Item]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:detailCell style="Table_TD" height="30"/>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="40" height="30" uuid="c8909b56-bc27-4346-a4b4-0f7699eba9fa"/>
+								<box leftPadding="3"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
 					</jr:column>
 					<jr:column width="240" uuid="9e9d9b29-3c9b-4645-bd93-c2f8bc2aeef3">
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
@@ -334,7 +341,7 @@ where v.id_orden_compra =$P{PNumeroOrden}]]>
 						</jr:columnHeader>
 						<jr:detailCell style="Table_TD" height="30">
 							<textField>
-								<reportElement x="0" y="0" width="80" height="30" uuid="c8909b56-bc27-4346-a4b4-0f7699eba9fa"/>
+								<reportElement x="0" y="0" width="80" height="30" uuid="b2e037be-3dd8-462d-b345-3485db796c73"/>
 								<box leftPadding="3"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$F{cantidad}]]></textFieldExpression>
