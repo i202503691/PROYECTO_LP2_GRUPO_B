@@ -81,6 +81,15 @@
                                         class="btn btn-outline-info" title="Ver detalle">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
+									<a th:href="@{/reporte/ordencompra(id=${item.idOrdenCompra})}"
+									    target="_blank"
+									    class="btn btn-outline-danger"
+									    title="Imprimir PDF">
+
+									    <i class="fa-solid fa-file-pdf"></i>
+
+									</a>
+									
                                     <select class="form-select form-select-sm estado-select" style="width: 130px;">
                                         <option value="PENDIENTE" th:selected="${item.estado == 'PENDIENTE'}">PENDIENTE</option>
                                         <option value="ENVIADO" th:selected="${item.estado == 'ENVIADO'}">ENVIADO</option>

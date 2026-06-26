@@ -56,9 +56,12 @@ public class OrdenCompraController {
             @RequestParam("materialId") List<Integer> materialIds,
             @RequestParam("cantidad") List<Double> cantidades,
             @RequestParam("precio") List<Double> precios,
-            RedirectAttributes flash) {
+            RedirectAttributes flash, HttpSession session) {
+    	
+    	Integer idUsuario = (Integer) session.getAttribute("idUsuario");
 
-        var response = ordenCompraService.create(proveedor, fecha, observaciones, materialIds, cantidades, precios);
+        var response = ordenCompraService.create(proveedor,  idUsuario, fecha, observaciones, materialIds, cantidades, 
+        		precios);
 
         if (!response.success()) {
             flash.addFlashAttribute("alert", Alert.sweetAlertError(response.mensaje()));

@@ -27,6 +27,10 @@ public class OrdenCompra {
     @ManyToOne
     @JoinColumn(name = "id_proveedor")
     private Proveedor proveedor;
+    
+    @ManyToOne
+    @JoinColumn(name = "id_usuario")
+    private Usuario usuario;
 
     @Column(name = "fecha")
     private LocalDate fecha;

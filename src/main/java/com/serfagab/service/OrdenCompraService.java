@@ -11,10 +11,12 @@ import com.serfagab.model.DetalleOrdenCompra;
 import com.serfagab.model.Material;
 import com.serfagab.model.OrdenCompra;
 import com.serfagab.model.Proveedor;
+import com.serfagab.model.Usuario;
 import com.serfagab.repository.DetalleOrdenCompraRepository;
 import com.serfagab.repository.MaterialRepository;
 import com.serfagab.repository.OrdenCompraRepository;
 import com.serfagab.repository.ProveedorRepository;
+import com.serfagab.repository.UsuarioRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class OrdenCompraService {
     private final DetalleOrdenCompraRepository detalleOrdenCompraRepository;
     private final ProveedorRepository proveedorRepository;
     private final MaterialRepository materialRepository;
+    private final UsuarioRepository usuarioRepository;
 
     public List<OrdenCompra> getAll() {
         return ordenCompraRepository.findAllByOrderByIdOrdenCompraDesc();
@@ -53,6 +56,7 @@ public class OrdenCompraService {
     @Transactional
     public ResultadoResponse create(
             Integer idProveedor,
+            Integer idUsuario,
             LocalDate fecha,
             String observaciones,
             List<Integer> materialIds,
@@ -60,9 +64,11 @@ public class OrdenCompraService {
             List<Double> precios) {
         try {
             Proveedor proveedor = proveedorRepository.findById(idProveedor).orElseThrow();
+            Usuario usuario = usuarioRepository.findById(1).orElseThrow();
 
             OrdenCompra orden = new OrdenCompra();
             orden.setProveedor(proveedor);
+            orden.setUsuario(usuario);
             orden.setFecha(fecha);
             orden.setEstado("PENDIENTE");
             orden.setObservaciones(observaciones);
