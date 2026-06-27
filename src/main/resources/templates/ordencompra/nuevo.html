@@ -144,6 +144,20 @@
                 var precioInput = tr.querySelector('.precio');
                 var selectedOpt = e.target.options[e.target.selectedIndex];
                 if (selectedOpt && selectedOpt.dataset.precio) {
+                    // Validar si el material ya está seleccionado en otra fila
+                    var materialId = e.target.value;
+                    var duplicado = false;
+                    var selects = document.querySelectorAll('select[name="materialId"]');
+                    selects.forEach(function (sel) {
+                        if (sel !== e.target && sel.value === materialId) {
+                            duplicado = true;
+                        }
+                    });
+                    if (duplicado) {
+                        Swal.fire('Material duplicado', 'Este material ya fue agregado. Modifique la cantidad si desea más.', 'warning');
+                        e.target.value = '';
+                        return;
+                    }
                     precioInput.value = selectedOpt.dataset.precio;
                     calcularFila(precioInput);
                 }
@@ -204,12 +218,20 @@
         document.getElementById('form-oc').addEventListener('submit', function (e) {
             var materiales = document.querySelectorAll('select[name="materialId"]');
             var valid = true;
+            var ids = [];
             materiales.forEach(function (sel) {
-                if (!sel.value) valid = false;
+                if (!sel.value) {
+                    valid = false;
+                } else {
+                    if (ids.includes(sel.value)) {
+                        valid = false;
+                    }
+                    ids.push(sel.value);
+                }
             });
             if (!valid) {
                 e.preventDefault();
-                Swal.fire('Error', 'Complete todos los materiales', 'error');
+                Swal.fire('Error', 'Complete todos los materiales o verifique que no haya materiales duplicados', 'error');
             }
         });
     </script>

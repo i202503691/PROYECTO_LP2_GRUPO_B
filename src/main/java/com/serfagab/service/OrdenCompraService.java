@@ -63,8 +63,12 @@ public class OrdenCompraService {
             List<Double> cantidades,
             List<Double> precios) {
         try {
+            var distinctIds = materialIds.stream().distinct().count();
+            if (distinctIds != materialIds.size()) {
+                return new ResultadoResponse(false, "No puede agregar materiales duplicados en la misma orden");
+            }
             Proveedor proveedor = proveedorRepository.findById(idProveedor).orElseThrow();
-            Usuario usuario = usuarioRepository.findById(1).orElseThrow();
+            Usuario usuario = usuarioRepository.findById(idUsuario).orElseThrow();
 
             OrdenCompra orden = new OrdenCompra();
             orden.setProveedor(proveedor);

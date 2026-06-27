@@ -34,6 +34,12 @@ public class ProveedorService {
 
     public ResultadoResponse create(Proveedor proveedor) {
         try {
+            if (proveedorRepository.existsByRazonSocial(proveedor.getRazonSocial())) {
+                return new ResultadoResponse(false, "Ya existe un proveedor con esa razon social");
+            }
+            if (proveedorRepository.existsByRuc(proveedor.getRuc())) {
+                return new ResultadoResponse(false, "Ya existe un proveedor con ese RUC");
+            }
             var registro = proveedorRepository.save(proveedor);
             var mensaje = String.format("Proveedor con Id %s registrado", registro.getIdProveedor());
             return new ResultadoResponse(true, mensaje);
@@ -49,6 +55,12 @@ public class ProveedorService {
 
     public ResultadoResponse update(Proveedor proveedor) {
         try {
+            if (proveedorRepository.existsByRazonSocialAndIdProveedorNot(proveedor.getRazonSocial(), proveedor.getIdProveedor())) {
+                return new ResultadoResponse(false, "Ya existe otro proveedor con esa razon social");
+            }
+            if (proveedorRepository.existsByRucAndIdProveedorNot(proveedor.getRuc(), proveedor.getIdProveedor())) {
+                return new ResultadoResponse(false, "Ya existe otro proveedor con ese RUC");
+            }
             var registro = proveedorRepository.save(proveedor);
             var mensaje = String.format("Proveedor con Id %s actualizado", registro.getIdProveedor());
             return new ResultadoResponse(true, mensaje);

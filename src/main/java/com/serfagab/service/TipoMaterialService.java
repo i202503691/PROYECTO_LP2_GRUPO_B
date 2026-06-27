@@ -23,6 +23,9 @@ public class TipoMaterialService {
 
     public ResultadoResponse create(TipoMaterial tipoMaterial) {
         try {
+            if (tipoMaterialRepository.existsByNombre(tipoMaterial.getNombre())) {
+                return new ResultadoResponse(false, "Ya existe un tipo de material con ese nombre");
+            }
             var registro = tipoMaterialRepository.save(tipoMaterial);
             var mensaje = String.format("Tipo de Material con Id %s registrado", registro.getIdTipoMaterial());
             return new ResultadoResponse(true, mensaje);
@@ -38,6 +41,9 @@ public class TipoMaterialService {
 
     public ResultadoResponse update(TipoMaterial tipoMaterial) {
         try {
+            if (tipoMaterialRepository.existsByNombreAndIdTipoMaterialNot(tipoMaterial.getNombre(), tipoMaterial.getIdTipoMaterial())) {
+                return new ResultadoResponse(false, "Ya existe otro tipo de material con ese nombre");
+            }
             var registro = tipoMaterialRepository.save(tipoMaterial);
             var mensaje = String.format("Tipo de Material con Id %s actualizado", registro.getIdTipoMaterial());
             return new ResultadoResponse(true, mensaje);

@@ -27,6 +27,9 @@ public class MaterialService {
 
     public ResultadoResponse create(Material material) {
         try {
+            if (materialRepository.existsByNombre(material.getNombre())) {
+                return new ResultadoResponse(false, "Ya existe un material con ese nombre");
+            }
             var registro = materialRepository.save(material);
             var mensaje = String.format("Material con Id %s registrado", registro.getIdMaterial());
             return new ResultadoResponse(true, mensaje);
@@ -42,6 +45,9 @@ public class MaterialService {
 
     public ResultadoResponse update(Material material) {
         try {
+            if (materialRepository.existsByNombreAndIdMaterialNot(material.getNombre(), material.getIdMaterial())) {
+                return new ResultadoResponse(false, "Ya existe otro material con ese nombre");
+            }
             var registro = materialRepository.save(material);
             var mensaje = String.format("Material con Id %s actualizado", registro.getIdMaterial());
             return new ResultadoResponse(true, mensaje);

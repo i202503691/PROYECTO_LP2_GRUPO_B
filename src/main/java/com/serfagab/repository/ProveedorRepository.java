@@ -12,6 +12,14 @@ import com.serfagab.model.Proveedor;
 @Repository
 public interface ProveedorRepository extends JpaRepository<Proveedor, Integer> {
 
+    boolean existsByRazonSocial(String razonSocial);
+
+    boolean existsByRuc(String ruc);
+
+    boolean existsByRazonSocialAndIdProveedorNot(String razonSocial, Integer idProveedor);
+
+    boolean existsByRucAndIdProveedorNot(String ruc, Integer idProveedor);
+
     List<Proveedor> findAllByOrderByIdProveedorDesc();
 
     @Query("""

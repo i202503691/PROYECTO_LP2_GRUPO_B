@@ -95,3 +95,41 @@ create table tbl_detalle_orden_compra(
 insert into tbl_detalle_orden_compra values
 (null,1,1,5,28,140),
 (null,2,2,5,28,140);
+
+ALTER TABLE tbl_orden_compra
+ADD COLUMN id_usuario INT NOT NULL DEFAULT 1;
+
+ALTER TABLE tbl_orden_compra
+ADD CONSTRAINT fk_orden_usuario
+FOREIGN KEY (id_usuario)
+REFERENCES tbl_usuario(id_usuario);
+
+CREATE VIEW v_detalle_orden_compra AS
+SELECT
+    d.id_detalle,
+    d.id_orden_compra,
+    m.nombre AS material,
+    d.cantidad,
+    d.precio_unitario,
+    d.subtotal
+FROM tbl_detalle_orden_compra d
+INNER JOIN tbl_material m
+ON d.id_material = m.id_material;
+
+CREATE OR REPLACE VIEW v_header_orden_compra AS
+SELECT
+    oc.id_orden_compra,
+    CONCAT('OC-', LPAD(oc.id_orden_compra,5,'0')) AS numeroOrden,
+    p.razon_social,
+    p.ruc,
+    CONCAT(u.nombres,' ',u.apellidos) AS nombreCompletoUsuario,
+    oc.fecha,
+    DATE_FORMAT(oc.fecha,'%d/%m/%Y') AS fechaTexto,
+    oc.estado,
+    oc.total,
+    oc.observaciones
+FROM tbl_orden_compra oc
+INNER JOIN tbl_proveedor p
+    ON oc.id_proveedor = p.id_proveedor
+INNER JOIN tbl_usuario u
+    ON oc.id_usuario = u.id_usuario;

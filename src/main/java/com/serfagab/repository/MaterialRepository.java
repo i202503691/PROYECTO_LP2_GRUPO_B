@@ -12,6 +12,10 @@ import com.serfagab.model.Material;
 @Repository
 public interface MaterialRepository extends JpaRepository<Material, Integer> {
 
+    boolean existsByNombre(String nombre);
+
+    boolean existsByNombreAndIdMaterialNot(String nombre, Integer idMaterial);
+
     List<Material> findAllByOrderByIdMaterialDesc();
 
     @Query("""
